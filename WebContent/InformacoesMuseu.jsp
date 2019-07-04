@@ -9,7 +9,7 @@
 <body>
 	<h1>Sistema de gerenciamento de museu</h1>
 	<h2>Informações do Museu</h2>
-	<form action="criarMuseu" method="post">
+	<form action="UsuarioActions" method="post">
 		<div class="container">
 			<label>Nome: ${museu.nome} <br></label>
 			<label>Data de criação: ${museu.data}<br></label>

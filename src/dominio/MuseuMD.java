@@ -20,8 +20,7 @@ import java.util.InputMismatchException;
 import dominio.exception.*;
 
 
-@WebServlet("/criarMuseu")
-public class MuseuMD extends HttpServlet
+public class MuseuMD
 {
 	private String nomeMuseu;
 	private String cidade;
@@ -41,54 +40,5 @@ public class MuseuMD extends HttpServlet
 		this.gestor = gestor;
 	}
 	
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
-	{
-		request.getSession().invalidate();
-		request.getRequestDispatcher("CriarSolicitacao.jsp").forward(request, response);
-	}
 	
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
-	{
-		String cmd = (String)request.getParameter("cmd");
-		
-		PrintWriter out = response.getWriter();
-		request.setCharacterEncoding("UTF-8");
-		
-		
-		if(cmd == null) 
-		{
-			doGet(request,response);
-		} 
-		else
-		{
-
-			if(!response.isCommitted())
-			{
-			
-				switch(cmd) 
-				{
-					case "Criar Museu":
-						
-						try
-						{
-							SolicitacaoMuseuFinder sol = new SolicitacaoMuseuFinder();
-							ArrayList<SolicitacaoMuseuDTO> solist = sol.getMuseuSolicitacaoList();
-							
-							request.setAttribute("ArrayList<SolicitacaoMuseuDTO>", solist);
-							request.getRequestDispatcher("AreaAdm.jsp").forward(request, response);
-						}
-						catch(SQLException e)
-						{
-							
-						}
-						
-						break;
-				}
-			}
-				
-		}
-	}
-
 }

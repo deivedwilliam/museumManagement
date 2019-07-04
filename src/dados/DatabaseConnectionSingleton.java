@@ -92,7 +92,8 @@ public class DatabaseConnectionSingleton
     	    	"cidade VARCHAR(100) NOT NULL,\r\n"+
     			"estado VARCHAR(100) NOT NULL,\r\n"+
     	    	"cpfGestor VARCHAR(11) NOT NULL,\r\n"+
-    	    	"senhaGestor VARCHAR(100) NOT NULL\r\n"+
+    	    	"senhaGestor VARCHAR(100) NOT NULL,\r\n" +
+    	    	"nomeGestor VARCHAR(100) NOT NULL\r\n" +
     			")"
     			
     	};

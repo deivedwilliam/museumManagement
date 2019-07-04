@@ -31,7 +31,7 @@ public class MuseuMdD implements IMapeadordeDados<MuseuDTO> {
 		this.insertMuseuStmt.setString(1, m.getNome());
 		this.insertMuseuStmt.setString(2, m.getCidade());
 		this.insertMuseuStmt.setString(3, m.getEstado());
-		this.insertMuseuStmt.setDate(4, Date.valueOf(m.getDataCriacao()));
+		this.insertMuseuStmt.setString(4,m.getDataCriacao());
 		this.insertMuseuStmt.setInt(5, m.getIdGestor());
 		
 		this.updateMuseuStmt.clearParameters();

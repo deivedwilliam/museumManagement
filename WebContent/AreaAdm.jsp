@@ -19,7 +19,7 @@
 	<h2>Área Administrativa</h2><br>
 	Bem Vindo <%= ((UsuarioMD)request.getAttribute("Usuario")).getNome() %>!
 		<br>
-		<form action="criarMuseu">
+		<form action="UsuarioActions" method="post">
 		<input type="submit" name="cmd" value="Criar Museu" >
 		</form>
 	</div>

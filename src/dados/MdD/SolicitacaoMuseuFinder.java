@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 import dados.DatabaseConnectionSingleton;
@@ -16,7 +17,7 @@ public class SolicitacaoMuseuFinder {
 	public SolicitacaoMuseuFinder() throws SQLException{
 		this.dbConn = DatabaseConnectionSingleton.getInstance().getConnection();
 		this.findByIDStmt = dbConn.prepareStatement(
-                "SELECT id, nome, dataCriacao, cidade, estado, cpfGestor, senhaGestor FROM Solicitacao WHERE id = ?");
+                "SELECT id, nome, dataCriacao, cidade, estado, cpfGestor, senhaGestor, nomeGestor FROM SolicitacaoMuseu WHERE id = ?");
 	}
 	public SolicitacaoMuseuDTO search(int Id) throws SQLException {
 		this.findByIDStmt.clearParameters();
@@ -28,7 +29,7 @@ public class SolicitacaoMuseuFinder {
 		{
 			SolicitacaoMuseuDTO solicitacao = new SolicitacaoMuseuDTO(
 					rs.getInt(1), rs.getString(2), rs.getString(3), 
-					rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7));
+					rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8));
 			return solicitacao;
 		}
 		return null;
@@ -36,23 +37,23 @@ public class SolicitacaoMuseuFinder {
 	
 	public ArrayList<SolicitacaoMuseuDTO> getMuseuSolicitacaoList() throws SQLException
 	{
-		ArrayList<SolicitacaoMuseuDTO> sol = new ArrayList<SolicitacaoMuseuDTO>();
-		this.dbConn = DatabaseConnectionSingleton.getInstance().getConnection();
-		this.findByIDStmt = dbConn.prepareStatement("SELECT id, nome, dataCriacao, cidade, estado, cpfGestor, senhaGestor FROM SolicitacaoMuseu");
-		this.findByIDStmt.clearParameters();
-		ResultSet rs = this.findByIDStmt.executeQuery();
-		
-		while(rs.next())
-		{
-			SolicitacaoMuseuDTO solicitacao = new SolicitacaoMuseuDTO(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7));
-			sol.add(solicitacao);
+		ArrayList<SolicitacaoMuseuDTO> lst = new ArrayList<SolicitacaoMuseuDTO>();
+		Statement stmt = dbConn.createStatement();
+		ResultSet rs = stmt.executeQuery("SELECT id, nome, dataCriacao, cidade, estado, cpfGestor, senhaGestor, nomeGestor FROM SolicitacaoMuseu");
+		while(rs.next()) {
+			SolicitacaoMuseuDTO solicitacao = new SolicitacaoMuseuDTO(
+					rs.getInt(1), rs.getString(2), rs.getString(3), 
+					rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8));
+			lst.add(solicitacao);
 		}
-		
+
 		if(this.dbConn != null)
 		{
 			this.dbConn.close();
 		}
 		
-		return sol;
+		return lst;
 	}
 }
+
+

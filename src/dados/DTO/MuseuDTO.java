@@ -1,17 +1,24 @@
 package dados.DTO;
 
-import java.time.LocalDate;
 
 public class MuseuDTO {
 	private int id;
 	private String Nome;
-	private LocalDate dataCriacao;
+	private String dataCriacao;
 	private String Cidade;
 	private String Estado;
 	private int idGestor;	
 	
-	public MuseuDTO(int id, String nome, LocalDate dataC, String cidade, String estado, int idGestor){
+	public MuseuDTO(int id, String nome, String dataC, String cidade, String estado, int idGestor){
 		this.id = id;
+		this.Nome = nome;
+		this.dataCriacao = dataC;
+		this.Cidade = cidade; 
+		this.Estado = estado;
+		this.idGestor = idGestor;
+	}
+	
+	public MuseuDTO(String nome, String dataC, String cidade, String estado, int idGestor){
 		this.Nome = nome;
 		this.dataCriacao = dataC;
 		this.Cidade = cidade; 
@@ -27,7 +34,7 @@ public class MuseuDTO {
 		return Nome;
 	}
 	
-	public LocalDate getDataCriacao() {
+	public String getDataCriacao() {
         return dataCriacao;
 	}
 	

@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
+<%@ page import="dados.DTO.*, java.util.*" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,18 +8,35 @@
 <title>Criação de Museu</title>
 </head>
 <body>
-	<h1>Sistema de gerenciamento de museu</h1>
-	<h2>Criação de Museu</h2>
-	<form action="criarMuseu" method="post">
-		<div class="container">
-			<label>Escolha o museu abaixo<br></label>
-			<select>
-				<% for(Museu item : Solicitacoes){ %>
-					<option><%=item.Nome%></option>
-				<% } %>
-			</select>			
-			<input type="submit" name="cmd" value="Criar Museu"/>
-		</div>
-	</form>
+ <table id="tabela-solicitacoes">
+        <tr>
+            <th>ID solicitação</th>
+            <th>Nome</th>
+            <th>Data de criação</th>
+            <th>Cidade</th>
+            <th>CPF do gestor</th>
+        </tr>
+
+        <%
+            ArrayList<SolicitacaoMuseuDTO> solicitacoes = (ArrayList<SolicitacaoMuseuDTO>) request.getAttribute("solicitacoes");
+            for (SolicitacaoMuseuDTO solicitacao : solicitacoes) {
+        %>
+        <tr>
+            <td>
+                <form id="solicitacao-<%= solicitacao.getId() %>-form" action="UsuarioActions" method="post">
+                    <input type="hidden" name="id" value="<%= solicitacao.getId() %>"/>
+                </form>
+            </td>
+             <td><%= solicitacao.getId() %></td>
+            <td><%= solicitacao.getNome() %></td>
+            <td><%= solicitacao.getDataCriacao() %></td>
+            <td><%= solicitacao.getCidade() %></td>
+            <td><%= solicitacao.getCpfGestor() %></td>
+            <td><input type="submit" value="Criar" name="cmd" form="solicitacao-<%= solicitacao.getId() %>-form"/></td>
+        </tr>
+        <%
+            }
+        %>
+</table>
 </body>
 </html>

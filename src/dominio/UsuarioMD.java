@@ -12,11 +12,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 
 import dominio.exception.*;
 import dados.DTO.*;
 import dados.ENUM.Tipo_Usuario;
+import dados.MdD.GestorMdD;
+import dados.MdD.MuseuMdD;
 import dados.MdD.SolicitacaoMuseuFinder;
 import dados.MdD.SolicitacaoMuseuMdD;
 import dados.MdD.UsuarioFinder;
@@ -24,13 +27,14 @@ import dados.MdD.UsuarioMdD;
 import dados.exception.*;
 
 
-@WebServlet("/efetuarLogin")
+@WebServlet("/UsuarioActions")
 public class UsuarioMD extends HttpServlet
 {
 	private static final long serialVersionUID = 1L;
 	private String nome;
 	private String cpf;
 	private String senha;
+	private int id;
 	private Tipo_Usuario tipoUsuario;
 	public static UsuarioMD userLogado;
 	
@@ -51,6 +55,15 @@ public class UsuarioMD extends HttpServlet
 		this.tipoUsuario = tipoUsuario;
 	}
 	
+	public UsuarioMD(String nome, String cpf, String senha, Tipo_Usuario tipoUsuario, int id)
+	{
+		this.nome = nome;
+		this.cpf = cpf;
+		this.senha = senha;
+		this.tipoUsuario = tipoUsuario;
+		this.id = id;
+	}
+	
 	
 	
 	public String getNome() {
@@ -64,13 +77,14 @@ public class UsuarioMD extends HttpServlet
 	public String getSenha() {
 		return this.senha;
 	}
+
 	private void criarSolicitacaoMuseu(String nomeMuseu, String nomeGestor, String cpfGestor, String senhaGestor, String estado, String cidade, String data)
 	{
 		try
 		{
 			SolicitacaoMuseuMdD novaSolicitacao = new SolicitacaoMuseuMdD();
 			
-			novaSolicitacao.set(new SolicitacaoMuseuDTO(nomeMuseu,data, cidade, estado, cpfGestor, senhaGestor));
+			novaSolicitacao.set(new SolicitacaoMuseuDTO(nomeMuseu,data, cidade, estado, cpfGestor, senhaGestor, nomeGestor));
 			novaSolicitacao.insert();
 			
 		}
@@ -94,8 +108,8 @@ public class UsuarioMD extends HttpServlet
 			{
 				throw new UsuarioNaoExiste();
 			}
-			
-			return new UsuarioMD(u.getNome(),u.getCPF(), u.getSenha(), u.getTipo());
+	
+			return new UsuarioMD(u.getNome(),u.getCPF(), u.getSenha(), u.getTipo(), u.getId());
 			
 		}
 		catch(SQLException e)
@@ -129,6 +143,20 @@ public class UsuarioMD extends HttpServlet
 		}
 		
 		return true;
+	}
+	
+	private void criarMuseu(String nomeMuseu, String dataCriacao, String cidade, String estado, int idGestor)
+	{
+		try
+		{
+			MuseuMdD mus = new MuseuMdD();
+			mus.set(new MuseuDTO(nomeMuseu, dataCriacao, cidade, estado, idGestor));
+			mus.insert();
+		}
+		catch(SQLException e)
+		{
+			throw new RuntimeException(e.getCause());
+		}
 	}
 	
 	
@@ -269,9 +297,15 @@ public class UsuarioMD extends HttpServlet
 							{
 								
 								userLogado = this.buscarUsuario(cpf);
+				
 								if(userLogado == null)
 								{
 									throw new UsuarioNaoExiste();
+								}
+								if(!userLogado.getSenha().equals(senha))
+								{
+									userLogado = null;
+									throw new SenhaInvalidaException();
 								}
 								if(userLogado.tipoUsuario == Tipo_Usuario.ADMINISTRADOR)
 								{
@@ -345,6 +379,69 @@ public class UsuarioMD extends HttpServlet
 							
 						break;
 						
+						case "Criar Museu":
+							
+							try
+							{
+								SolicitacaoMuseuFinder solmuseu = new SolicitacaoMuseuFinder();
+								ArrayList<SolicitacaoMuseuDTO> sollist = new ArrayList<SolicitacaoMuseuDTO>();
+							
+								sollist = solmuseu.getMuseuSolicitacaoList();
+								
+								//request.setAttribute("Usuario", userLogado);
+								request.setAttribute("solicitacoes", sollist);
+							///	request.getSession().setAttribute("nome", userLogado.getNome());
+								request.getRequestDispatcher("CriarMuseu.jsp").forward(request, response);
+							}
+							catch(SQLException e)
+							{
+								 throw new RuntimeException(e.getCause());
+							}
+							
+							
+						break;
+						
+						case "Criar":
+							
+							try
+							{
+								SolicitacaoMuseuFinder f = new SolicitacaoMuseuFinder();
+								int idSolicitacao = Integer.parseInt(request.getParameter("id"));
+								int idGestor;
+								SolicitacaoMuseuMdD m = new SolicitacaoMuseuMdD();
+								
+								SolicitacaoMuseuDTO soldto = f.search(idSolicitacao);
+								
+								this.verificarCPF(soldto.getCpfGestor());
+								this.verificarSenha(soldto.getSenhaGestor());
+								
+								this.inserirUsuario(soldto.getNomeGestor(), soldto.getCpfGestor(), soldto.getSenhaGestor()); 
+								
+								idGestor = this.buscarUsuario(soldto.getCpfGestor()).id;
+								this.criarMuseu(soldto.getNome(), soldto.getDataCriacao(), soldto.getCidade(), soldto.getEstado(), idGestor);
+							//	m.set(soldto);
+							//	m.delete();
+								request.setAttribute("Usuario", userLogado);
+								request.getSession().setAttribute("nome", userLogado.getNome());
+								request.getRequestDispatcher("AreaAdm.jsp").forward(request, response);
+							}
+							catch(SQLException e)
+							{
+								throw new RuntimeException(e.getCause());
+							} 
+							catch(UsuarioJaExiste e)
+							{
+			
+								e.printStackTrace();
+							}
+							catch(UsuarioNaoExiste e)
+							{
+							
+								e.printStackTrace();
+							}
+							
+							break;
+						
 						default:
 							
 							doGet(request,response);
@@ -358,6 +455,10 @@ public class UsuarioMD extends HttpServlet
 				catch(SenhaRN1Exception e)
 				{
 					request.getRequestDispatcher("SenhaForaDaRegra.jsp").forward(request, response);
+				}
+				catch(SenhaInvalidaException e)
+				{
+					request.getRequestDispatcher("SenhaInvalida.jsp").forward(request, response);
 				}
 			}
 		}

@@ -9,7 +9,7 @@
 <body>
 	<h1>Sistema de gerenciamento de museu</h1>
 	<h2>Login</h2>
-	<form action="efetuarLogin" method="post" >
+	<form action="UsuarioActions" method="post" >
 	<div class = "container">
 		<label>CPF<br></label>
 		<input type="text" placeholder="Digite o CPF" name="cpfUsuario">
