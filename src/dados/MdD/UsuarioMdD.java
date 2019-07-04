@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import dados.DatabaseConnectionSingleton;
+import dados.DTO.AdministradorDTO;
 import dados.DTO.Usuario;
 
 public class UsuarioMdD implements IMapeadordeDados<Usuario> 
@@ -40,6 +41,7 @@ public class UsuarioMdD implements IMapeadordeDados<Usuario>
 	@Override
 	public void insert() throws SQLException {
 		this.insertStmt.executeUpdate();
+		this.insertStmt.close();
 	}
 
 	@Override
@@ -51,6 +53,23 @@ public class UsuarioMdD implements IMapeadordeDados<Usuario>
 	@Override
 	public void update() throws SQLException {
 		this.updateStmt.executeUpdate();
+	}
+	
+	public static void main(String[] args) 
+	{
+		
+		try
+		{
+			UsuarioMdD adm = new UsuarioMdD();
+			
+			adm.set(new AdministradorDTO("Vinicius", "16579504765", "25902647"));
+			adm.insert();
+		}
+		catch(SQLException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

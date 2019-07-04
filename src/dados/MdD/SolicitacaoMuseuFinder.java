@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+
 import dados.DatabaseConnectionSingleton;
 import dados.DTO.SolicitacaoMuseuDTO;
 
@@ -21,12 +23,36 @@ public class SolicitacaoMuseuFinder {
 		this.findByIDStmt.setInt(1, Id);
 		
 		ResultSet rs = this.findByIDStmt.executeQuery();
-		if(rs.next()) {
+		
+		if(rs.next())
+		{
 			SolicitacaoMuseuDTO solicitacao = new SolicitacaoMuseuDTO(
 					rs.getInt(1), rs.getString(2), rs.getString(3), 
 					rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7));
 			return solicitacao;
 		}
 		return null;
+	}
+	
+	public ArrayList<SolicitacaoMuseuDTO> getMuseuSolicitacaoList() throws SQLException
+	{
+		ArrayList<SolicitacaoMuseuDTO> sol = new ArrayList<SolicitacaoMuseuDTO>();
+		this.dbConn = DatabaseConnectionSingleton.getInstance().getConnection();
+		this.findByIDStmt = dbConn.prepareStatement("SELECT id, nome, dataCriacao, cidade, estado, cpfGestor, senhaGestor FROM SolicitacaoMuseu");
+		this.findByIDStmt.clearParameters();
+		ResultSet rs = this.findByIDStmt.executeQuery();
+		
+		while(rs.next())
+		{
+			SolicitacaoMuseuDTO solicitacao = new SolicitacaoMuseuDTO(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7));
+			sol.add(solicitacao);
+		}
+		
+		if(this.dbConn != null)
+		{
+			this.dbConn.close();
+		}
+		
+		return sol;
 	}
 }

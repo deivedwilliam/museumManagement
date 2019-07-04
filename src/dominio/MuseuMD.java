@@ -3,6 +3,7 @@ package dominio;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,6 +11,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import dados.DTO.SolicitacaoMuseuDTO;
+import dados.MdD.SolicitacaoMuseuFinder;
+
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 
 import dominio.exception.*;
@@ -58,7 +63,31 @@ public class MuseuMD extends HttpServlet
 		} 
 		else
 		{
+
+			if(!response.isCommitted())
+			{
 			
+				switch(cmd) 
+				{
+					case "Criar Museu":
+						
+						try
+						{
+							SolicitacaoMuseuFinder sol = new SolicitacaoMuseuFinder();
+							ArrayList<SolicitacaoMuseuDTO> solist = sol.getMuseuSolicitacaoList();
+							
+							request.setAttribute("ArrayList<SolicitacaoMuseuDTO>", solist);
+							request.getRequestDispatcher("AreaAdm.jsp").forward(request, response);
+						}
+						catch(SQLException e)
+						{
+							
+						}
+						
+						break;
+				}
+			}
+				
 		}
 	}
 

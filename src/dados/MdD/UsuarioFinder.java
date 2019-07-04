@@ -44,6 +44,8 @@ public class UsuarioFinder {
         	return retorno;
         }
         
+        this.dbConn.close();
+        
 		return null;
 	}
 }

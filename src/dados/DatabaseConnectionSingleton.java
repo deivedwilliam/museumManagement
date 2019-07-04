@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import org.apache.derby.iapi.sql.ResultSet;
 import org.apache.derby.jdbc.EmbeddedDriver;
 
 
@@ -140,6 +141,49 @@ public class DatabaseConnectionSingleton
 			}
 	    }
 	}
+
+	public void printTableSolicitacaoMuseu()
+	{
+		Connection con = null;
+		
+		String sql = "SELECT id, nome, dataCriacao, cidade, estado, cpfGestor, senhaGestor FROM SolicitacaoMuseu";		
+		try
+		{
+			con = this.getConnection();
+	    	PreparedStatement s = con.prepareStatement(sql);
+			java.sql.ResultSet r =  s.executeQuery();
+			
+			while(r.next())
+			{
+				int id  = r.getInt(1);
+				String nome = r.getString(2);
+				String dataCriacao = r.getString(3);
+				String cidade = r.getString(4);
+				String estado = r.getString(5);
+				String cpfGestor = r.getString(6);
+				String senhaGestor = r.getString(7);
+				System.out.println("id: " + id + " " + nome + " " + dataCriacao + " " + " " + cidade + " " + estado +" "+ cpfGestor +" "+ senhaGestor);
+			}
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
+   
+	
+		if(con != null)
+		{
+			try
+			{
+				con.close();
+			}
+		    catch(SQLException e)
+			{
+		    	
+			}
+		}
+	}
+
     
     public static void main(String[] args)
     {

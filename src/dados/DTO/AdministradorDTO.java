@@ -10,4 +10,8 @@ public class AdministradorDTO extends Usuario
 		super(id, nome, cpf, senha, Tipo_Usuario.ADMINISTRADOR);
 	}
 	
+	public AdministradorDTO(String nome, String cpf, String senha) 
+	{
+		super(nome, cpf, senha, Tipo_Usuario.ADMINISTRADOR);
+	}
 }

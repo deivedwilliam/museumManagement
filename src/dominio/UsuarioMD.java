@@ -32,6 +32,7 @@ public class UsuarioMD extends HttpServlet
 	private String cpf;
 	private String senha;
 	private Tipo_Usuario tipoUsuario;
+	public static UsuarioMD userLogado;
 	
 	//private static FachadaDados camadaDados = FachadaDados.getMock();
 	
@@ -53,13 +54,16 @@ public class UsuarioMD extends HttpServlet
 	
 	
 	public String getNome() {
-		return nome;
+		return this.nome;
 	}
 
 	public String getCpf() {
-		return cpf;
+		return this.cpf;
 	}
 	
+	public String getSenha() {
+		return this.senha;
+	}
 	private void criarSolicitacaoMuseu(String nomeMuseu, String nomeGestor, String cpfGestor, String senhaGestor, String estado, String cidade, String data)
 	{
 		try
@@ -68,6 +72,7 @@ public class UsuarioMD extends HttpServlet
 			
 			novaSolicitacao.set(new SolicitacaoMuseuDTO(nomeMuseu,data, cidade, estado, cpfGestor, senhaGestor));
 			novaSolicitacao.insert();
+			
 		}
 		catch(SQLException e)
 		{
@@ -216,8 +221,17 @@ public class UsuarioMD extends HttpServlet
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
 		String cmd = (String)request.getParameter("cmd");
-		
 		PrintWriter out = response.getWriter();
+		String cpf;
+		String senha;
+		String nome;
+		String nomeMuseu;
+		String cidade;
+		String estado;
+		String nomeGestor;
+		String senhaGestor;
+		String cpfGestor;
+		String data;
 		
 		request.setCharacterEncoding("UTF-8");
 		
@@ -229,17 +243,6 @@ public class UsuarioMD extends HttpServlet
 		else
 		{
 			
-			String cpf;
-			String senha;
-			String nome;
-			
-			cpf = (String)request.getParameter("cpfUsuario");
-			senha = (String)request.getParameter("pswUsuario");
-			
-			if(cpf.isEmpty() || senha.isEmpty())
-			{
-				request.getRequestDispatcher("UsuarioNaoInformaDados.jsp").forward(request, response);
-			}
 			
 			
 			if(!response.isCommitted())
@@ -251,27 +254,37 @@ public class UsuarioMD extends HttpServlet
 						
 						case "Entrar":
 							
+							cpf = (String)request.getParameter("cpfUsuario");
+							senha = (String)request.getParameter("pswUsuario");
+							
+							if(cpf.isEmpty() || senha.isEmpty())
+							{
+								request.getRequestDispatcher("UsuarioNaoInformaDados.jsp").forward(request, response);
+							}
+							
 							
 							this.verificarCPF(cpf);
 							
 							try
 							{
-								UsuarioMD usuarioMD;
 								
-								usuarioMD = this.buscarUsuario(cpf);
-								if(usuarioMD == null)
+								userLogado = this.buscarUsuario(cpf);
+								if(userLogado == null)
 								{
 									throw new UsuarioNaoExiste();
 								}
-								if(usuarioMD.tipoUsuario == Tipo_Usuario.ADMINISTRADOR)
+								if(userLogado.tipoUsuario == Tipo_Usuario.ADMINISTRADOR)
 								{
+									request.setAttribute("Usuario", userLogado);
+									request.getSession().setAttribute("nome", userLogado.getNome());
 									request.getRequestDispatcher("AreaAdm.jsp").forward(request, response);
 
 								}
-								else if(usuarioMD.tipoUsuario == Tipo_Usuario.VISITANTE)
+								else if(userLogado.tipoUsuario == Tipo_Usuario.VISITANTE)
 								{
-									request.setAttribute("Usuario", usuarioMD);
-									request.getSession().setAttribute("nome", usuarioMD.nome);
+									
+									request.setAttribute("Usuario", userLogado);
+									request.getSession().setAttribute("nome", userLogado.getNome());
 									request.getRequestDispatcher("AreaUsuario.jsp").forward(request, response);
 
 								}
@@ -289,6 +302,8 @@ public class UsuarioMD extends HttpServlet
 							
 						case "Cadastrar Usuario":
 							
+							cpf = (String)request.getParameter("cpfUsuario");
+							senha = (String)request.getParameter("pswUsuario");
 							nome = request.getParameter("nomeUsuario");
 							
 							this.verificarCPF(cpf);
@@ -313,14 +328,7 @@ public class UsuarioMD extends HttpServlet
 						break;
 						
 						case "Solicitar Criacao":
-							
-							String nomeMuseu;
-							String cidade;
-							String estado;
-							String nomeGestor;
-							String senhaGestor;
-							String cpfGestor;
-							String data;
+			
 							
 							nomeMuseu = request.getParameter("nomeMuseu");
 							cidade = request.getParameter("cidadeMuseu");
@@ -331,7 +339,8 @@ public class UsuarioMD extends HttpServlet
 							data = request.getParameter("dataCriacao");
 							
 							this.criarSolicitacaoMuseu(nomeMuseu, nomeGestor, cpfGestor, senhaGestor, estado, cidade, data);
-							
+							request.setAttribute("Usuario", userLogado);
+							request.getSession().setAttribute("nome", userLogado.getNome());
 							request.getRequestDispatcher("AreaUsuario.jsp").forward(request, response);
 							
 						break;
